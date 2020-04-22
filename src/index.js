@@ -11,6 +11,6 @@ let vm = new Vue({
   computed:{},
   watch:{}
 })
-
+console.log(vm)
 vm.arr.push(123)
 // vm.arr[1] = 123 

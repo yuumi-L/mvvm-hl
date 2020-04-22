@@ -7,7 +7,7 @@ class Observe{
     if(Array.isArray(data)){
       data.__proto__ = arrayMethods 
     }else{
-      this.walk(data)    
+      this.walk(data)
     }
   }
 
@@ -24,7 +24,7 @@ class Observe{
 
 export function defineReactive(data, key, value){
   // 观察value 是不是一个对象然后监听  如果是一个对象就递归监听
-  observe(value)
+  observe(value) // 如果是对象会递归调用observe
   Object.defineProperty(data, key, {
     get(){
       console.log('获取数据')

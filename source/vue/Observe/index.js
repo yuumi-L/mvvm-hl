@@ -13,6 +13,7 @@ export function initState(vm){
     initWatch(vm)
   }
 }
+
 function proxy(vm, source, key){
   Object.defineProperty(vm, key, {
     get(){
@@ -43,7 +44,7 @@ export function observe(data){
     return
   }
   return new Observe(data) // 观察数据的业务逻辑
-  }
+}
 
 function initComputed(vm){
   
