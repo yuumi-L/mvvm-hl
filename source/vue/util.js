@@ -1,23 +1,26 @@
 const defaultRE = /\{\{((?:.|\r?\n)+?)\}\}/g
 
 export const util = {
-  getValue(vm, exp){
+  getValue(vm, exp) {
     let keys = exp.split('.')
     return keys.reduce((memo, current) => {
       memo = memo[current]
       return memo
-    },vm)
+    }, vm)
   },
-  compilerText(node, vm){
+  compilerText(node, vm) {
     // 编译文本 
-    node.textContent = node.textContent.replace(defaultRE, function(...args){
+    if (!node.expr) {
+      node.expr = node.textContent
+    }
+    node.textContent = node.expr.replace(defaultRE, function (...args) {
       return util.getValue(vm, args[1])
     })
   }
 }
 
 
-export function compiler(node, vm){
+export function compiler(node, vm) {
   // 取出子节点
   let childNodes = node.childNodes;
   // 将类数组转成数组
@@ -28,9 +31,9 @@ export function compiler(node, vm){
      * 3 text 文本节点
      * 
     */
-    if(child.nodeType === 1){
+    if (child.nodeType === 1) {
       compiler(child, vm)
-    }else if(child.nodeType === 3){
+    } else if (child.nodeType === 3) {
       util.compilerText(child, vm)
     }
   });
