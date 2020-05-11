@@ -12,12 +12,8 @@ let vm = new Vue({
   watch: {}
 })
 setTimeout(() => {
-  vm.msg = 'world1'
-  vm.msg = 'world2'
-  vm.msg = 'world3'
-  vm.msg = 'world4'
-  vm.msg = 'world5'
-  vm.msg = 'world6'
+  vm.arr.push(6)
+  console.log(vm)
 }, 2000);
 // console.log(vm)
 // vm.arr.push(123)

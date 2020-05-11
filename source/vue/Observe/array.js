@@ -8,10 +8,10 @@ let oldArrayProtoMethods = Array.prototype
 export let arrayMethods = Object.create(oldArrayProtoMethods)
 
 // methods 修改
-let methods = ['push','shift','unshift','pop','reverse','sort','splice']
+let methods = ['push', 'shift', 'unshift', 'pop', 'reverse', 'sort', 'splice']
 
 methods.forEach(method => {
-  arrayMethods[method] = function(...args){
+  arrayMethods[method] = function (...args) {
     // 不光要返回新的数组方法  还要执行监听
     let res = oldArrayProtoMethods[method].apply(this, args)
 
@@ -20,7 +20,7 @@ methods.forEach(method => {
     switch (method) {
       case 'push':
       case 'unshift':
-        inserted = args        
+        inserted = args
         break;
       case 'splice':
         inserted = args.slice(2)
@@ -28,17 +28,27 @@ methods.forEach(method => {
         break;
     }
     // 实现新增属性的监听 
-    if(inserted) observerArray(inserted)
+    if (inserted) observerArray(inserted)
     // 通知视图更新
-    // todo
-    console.log('实现监听数组属性的变化')    
+    this.__ob__.dep.notify()
+    console.log('实现监听数组属性的变化')
     return res
   }
 });
 
-function observerArray(inserted){
+function observerArray(inserted) {
   // 循环新增数组中每一个属性进行监听
   for (let i = 0; i < inserted.length; i++) {
     (inserted[i])
+  }
+}
+// 递归收集依赖
+export function dependArray(value) {
+  for (let i = 0; i < value.length; i++) {
+    let currentItem = value[i]
+    currentItem.__ob__ && currentItem.__ob__.dep.depend()
+    if (Array.isArray(currentItem)) {
+      dependArray(currentItem) // 递归收集多维数组
+    }
   }
 }
