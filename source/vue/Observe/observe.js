@@ -7,6 +7,7 @@ class Observe {
     // 实现监听  将用户的数据使用Object.defineProperty 定义
     // 创建数组专用的dep
     this.dep = new Dep()
+
     // 给每个对象包括数组添加一个属性，__ob__
     Object.defineProperty(data, '__ob__', {
       get: () => this
