@@ -12,8 +12,7 @@ let vm = new Vue({
   watch: {}
 })
 setTimeout(() => {
-  vm.arr.push(6)
-  console.log(vm)
+  // vm.arr.push(6)
 }, 2000);
 // console.log(vm)
 // vm.arr.push(123)
