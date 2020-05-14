@@ -47,6 +47,13 @@ Vue.prototype._update = function () {
 
 }
 
+Vue.prototype.$watch = function (key, handler) {
+  let vm = this
+  new Watcher(vm, key, handler, {
+    user: true // 代表用户创建的watcher
+  })
+}
+
 function query(el) {
   if (typeof el === 'string') {
     return document.querySelector(el)

@@ -1,4 +1,6 @@
 import Observe from './observe'
+import Watcher from './watcher'
+import Dep from './dep'
 
 
 export function initState(vm) {
@@ -7,7 +9,7 @@ export function initState(vm) {
     initData(vm)
   }
   if (opts.computed) {
-    initComputed(vm)
+    initComputed(vm, opts.computed)
   }
   if (opts.watch) {
     initWatch(vm)
@@ -48,11 +50,43 @@ export function observe(data) {
   }
   return new Observe(data) // 观察数据的业务逻辑
 }
-
-function initComputed(vm) {
-
+function createComputedGetter(vm, key) {
+  let watcher = vm._watcherComputed[key]
+  return function () {
+    if (watcher) {
+      if (watcher.dirty) {
+        // 页面取值的时候 dirty如果是true的话就调用get方法计算
+        watcher.evalValue()
+      }
+      if (Dep.target) {
+        watcher.depend()
+      }
+      return watcher.value
+    }
+  }
+}
+function initComputed(vm, computed) {
+  // 计算属性是有缓存的
+  let watchers = vm._watcherComputed = Object.create(null)
+  for (let key in computed) {
+    let userDef = computed[key]
+    watchers[key] = new Watcher(vm, userDef, () => { }, {
+      lazy: true
+    })
+    // 当用户取值的时候， 将key定义到vm上
+    Object.defineProperty(vm, key, {
+      get: createComputedGetter(vm, key)
+    })
+  }
 }
 
 function initWatch(vm) {
-
+  let watch = vm.$options.watch // 是个{}
+  for (let key in watch) {
+    let handler = watch[key]
+    createWatch(vm, key, handler)
+  }
+}
+function createWatch(vm, key, handler) {
+  return vm.$watch(key, handler)
 }

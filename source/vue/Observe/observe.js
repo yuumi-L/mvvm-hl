@@ -33,12 +33,12 @@ class Observe {
 export function defineReactive(data, key, value) {
   // 观察value 是不是一个对象然后监听  如果是一个对象就递归监听
   let childOb = observe(value) // 如果是对象会递归调用observe
-  console.log('=========================================STARD')
-  console.log(data)
-  console.log(childOb)
-  console.log(key)
-  console.log(value)
-  console.log('=========================================END')
+  // console.log('=========================================STARD')
+  // console.log(data)
+  // console.log(childOb)
+  // console.log(key)
+  // console.log(value)
+  // console.log('=========================================END')
   let dep = new Dep()
   Object.defineProperty(data, key, {
     get() {

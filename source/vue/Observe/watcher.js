@@ -1,24 +1,41 @@
 import { pushTarget, popTarget } from "./dep"
+import { util } from "../util"
 
 let id = 0
 class Watcher {
-  constructor(vm, exprOrFn, cb = () => { }, opts) {
+  constructor(vm, exprOrFn, cb = () => { }, opts = {}) {
     this.vm = vm
     this.expOrFn = exprOrFn
     this.cb = cb
     this.id = id++
     this.deps = []
     this.depsId = new Set()
+    this.lazy = opts.lazy
+    this.dirty = this.lazy
     if (typeof exprOrFn === 'function') {
       this.getter = exprOrFn
+    } else {
+      // 现在 exprOrFn 是我们传进来的key
+      this.getter = function () {
+        return util.getValue(vm, exprOrFn)
+      }
     }
-    this.get() // 默认创建一个watcher  会调用自身的get  
+    if (opts.user) {
+      this.user = true
+    }
+    // 如果当前是计算属性的话 不会默认调用get方法
+    this.value = this.lazy ? undefined : this.get() // 取出的是老值
+  }
+  evalValue() {
+    this.value = this.get()
+    this.dirty = false
   }
   get() {
     // 渲染watcher
     pushTarget(this) // Dep.target = watcher
-    this.getter() //  当获取属性的时候 会增加一个watcher
+    let value = this.getter.call(this.vm) //  当获取属性的时候 会增加一个watcher
     popTarget()
+    return value
   }
   addDep(dep) {
     let id = dep.id
@@ -30,12 +47,24 @@ class Watcher {
     }
   }
   update() {
+    if (this.lazy) {
+      this.dirty = true
+    }
     // 批量更新防止重复渲染
     queueWatcher(this)
     // this.get()
   }
   run() {
-    this.get()
+    let value = this.get()  // 新值
+    if (this.value !== value) { // this.value 是老值 value 是新值
+      this.cb(value, this.value)
+    }
+  }
+  depend() { // 主要用于conputer的watcher
+    let i = this.deps.length
+    while (i--) {
+      this.deps[i].depend()
+    }
   }
 }
 let has = {}
